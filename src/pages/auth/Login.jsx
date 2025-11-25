@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import API from "../../utils/interceptor";
 import { useNavigate } from "react-router-dom";
 import styles from "../../styles/pages/Login.module.css";
 
@@ -20,15 +20,15 @@ function Login() {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5000/api/login", form);
+
+      const res = await API.post("/api/login", form);
 
       const token = res.data.token;
       localStorage.setItem("token", token);
 
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
       alert("Login successful!");
       navigate("/home");
+
     } catch (err) {
       setErrorMsg(err.response?.data?.message || "Login failed");
     } finally {
@@ -39,8 +39,6 @@ function Login() {
   return (
     <div className={styles.outer}>
       <div className={styles.frame}>
-
-        {/* LEFT PANEL – same as Signup */}
         <div className={styles.left}>
           <div className={styles.leftContent}>
             <h1>WELCOME<br/>BACK!</h1>
@@ -48,12 +46,10 @@ function Login() {
           </div>
         </div>
 
-        {/* RIGHT PANEL */}
         <div className={styles.right}>
           <form className={styles.form} onSubmit={handleSubmit}>
             <h2>Login</h2>
 
-            {/* Email */}
             <label className={styles.field}>
               <span className={styles.labelText}>Email</span>
               <div className={styles.inputRow}>
@@ -67,7 +63,6 @@ function Login() {
               </div>
             </label>
 
-            {/* Password */}
             <label className={styles.field}>
               <span className={styles.labelText}>Password</span>
 
@@ -89,7 +84,6 @@ function Login() {
               </div>
             </label>
 
-            {/* Forgot */}
             <p
               className={styles.forgot}
               onClick={() => navigate("/reset-password")}

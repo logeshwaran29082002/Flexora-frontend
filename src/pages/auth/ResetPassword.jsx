@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../../utils/interceptor";
 import styles from "../../styles/pages/ResetPassword.module.css";
 
 function ResetPassword() {
@@ -12,10 +12,7 @@ function ResetPassword() {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/reset-password",
-        { email }
-      );
+      const res = await API.post("/api/reset-password", { email });
 
       const token = res.data.token;
 
@@ -29,8 +26,7 @@ function ResetPassword() {
   return (
     <div className={styles.outer}>
       <div className={styles.frame}>
-        
-        {/* LEFT PANEL */}
+
         <div className={styles.left}>
           <div className={styles.leftContent}>
             <h1>Reset<br/>Password</h1>
@@ -38,7 +34,6 @@ function ResetPassword() {
           </div>
         </div>
 
-        {/* RIGHT PANEL */}
         <div className={styles.right}>
           <form className={styles.form} onSubmit={handleSubmit}>
 

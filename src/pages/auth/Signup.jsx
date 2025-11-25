@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import API from "../../utils/interceptor";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
@@ -22,12 +22,10 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✔ Name validation
     if (!/^[A-Za-z ]{5,30}$/.test(form.name)) {
       return alert("Enter a valid name (Only letters and spaces, 5-30 characters)");
     }
 
-    // ✔ Password validation
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}[\]|:;"'<>,.?/]).{8,}$/;
 
@@ -37,19 +35,13 @@ function Signup() {
       );
     }
 
-    // ✔ Email validation
     if (!form.email.toLowerCase().endsWith("@gmail.com")) {
       return alert("Only Gmail email IDs are allowed!");
     }
 
     try {
-      // ✔ SEND DATA TO BACKEND
-      const response = await axios.post(
-        "http://localhost:5000/api/signup",
-        form
-      );
+      const response = await API.post("/api/signup", form);
 
-      // ✔ MOVE TO OTP VERIFY PAGE
       navigate("/verify-otp", {
         state: {
           email: form.email,
@@ -59,7 +51,7 @@ function Signup() {
     } catch (err) {
       alert(err.response?.data?.message || "Signup failed");
     }
-  };
+  };   // <-- CORRECT — only 1 closing curly here
 
   return (
     <div className={styles.outer}>
@@ -156,30 +148,29 @@ function Signup() {
             </label>
 
             {/* GOOGLE LOGIN */}
-       <div className={styles.googleBtn}>
-  <GoogleLogin
-    onSuccess={async (credentialResponse) => {
-      try {
-        const decoded = jwtDecode(credentialResponse.credential);
+            <div className={styles.googleBtn}>
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  try {
+                    const decoded = jwtDecode(credentialResponse.credential);
 
-        await axios.post("http://localhost:5000/api/google-login", {
-          name: decoded.name,
-          email: decoded.email,
-          picture: decoded.picture,
-        });
+                    await API.post("/api/google-login", {
+                      name: decoded.name,
+                      email: decoded.email,
+                      picture: decoded.picture,
+                    });
 
-        navigate("/home");
-      } catch (err) {
-        alert("Google Login Failed");
-      }
-    }}
-    onError={() => {
-      alert("Google Login Failed");
-    }}
-  />
-</div>
+                    navigate("/home");
+                  } catch (err) {
+                    alert("Google Login Failed");
+                  }
+                }}
+                onError={() => {
+                  alert("Google Login Failed");
+                }}
+              />
+            </div>
 
-            {/* NORMAL SIGNUP BUTTON */}
             <button type="submit" className={styles.cta}>
               Sign Up
             </button>
